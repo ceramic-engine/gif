@@ -9,16 +9,16 @@ package gif;
  * Ported to Haxe by Tilman Schmidt and Sven Bergström
  */
 
-import haxe.io.UInt8Array;
 import haxe.io.BytesOutput;
+import haxe.io.UInt8Array;
 
-@:enum abstract GifRepeat(Int)
+enum abstract GifRepeat(Int)
   from Int to Int {
     var None = 0;
     var Infinite = -1;
 }
 
-@:enum abstract GifQuality(Int)
+enum abstract GifQuality(Int)
   from Int to Int {
     var Best = 1;
     var VeryHigh = 10;
@@ -47,7 +47,7 @@ class GifEncoder {
     var indexedPixels: UInt8Array;           // Converted frame indexed to palette
     var colorTab: UInt8Array;                // RGB palette
     var usedEntry: Array<Bool>;              // Active palette entries
-        //        
+        //
     var nq: NeuQuant;
     var lzwEncoder: LzwEncoder;
         //internal
@@ -55,7 +55,7 @@ class GifEncoder {
     var first_frame: Bool = true;
 
         //:todo: error handling could be better - but throw inside of another thread on cpp is too quiet
-        
+
         /** Allows a custom print handler for error messages.
             Defaults to Sys.println on sys targets, and trace otherwise. */
     public var print: Dynamic->Void;
@@ -86,11 +86,11 @@ class GifEncoder {
         _repeat:Int = GifRepeat.Infinite,
         _quality:Int = 10
     ) {
-        
-        #if sys 
+
+        #if sys
             print = Sys.println;
-        #else 
-            print = function(v) { trace(v); } 
+        #else
+            print = function(v) { trace(v); }
         #end
 
         width = _frame_width;
@@ -140,9 +140,9 @@ class GifEncoder {
         analyze(pixels);
 
         if(first_frame) {
-            
+
             write_palette(output);
-            
+
             if(repeat != GifRepeat.None) {
                 write_NetscapeExt(output);
             }
@@ -232,7 +232,7 @@ class GifEncoder {
             /** Writes Logical Screen Descriptor. */
         function write_LSD(output:BytesOutput) {
             //
-            
+
                 // Logical screen size
             output.writeInt16(width);
             output.writeInt16(height);
@@ -268,7 +268,7 @@ class GifEncoder {
 
             /** Write color table. */
         function write_palette(output:BytesOutput):Void {
-            
+
             output.write(colorTab.view.buffer);
 
             var n:Int = (3 * 256) - colorTab.length;
@@ -281,10 +281,10 @@ class GifEncoder {
 
             /** Encodes and writes pixel data. */
         function write_pixels(output:BytesOutput):Void {
-        
+
             lzwEncoder.reset(indexedPixels, colorDepth);
             lzwEncoder.encode(output);
-        
+
         } //write_pixels
 
             /** Writes Image Descriptor. */
@@ -303,13 +303,13 @@ class GifEncoder {
                 output.writeByte(0);                // No LCT  - GCT is used for first (or only) frame
 
             } else {
-                    
+
                 output.writeByte(0x80 |             // 1 local color table  1=yes
                                     0 |             // 2 interlace - 0=no
                                     0 |             // 3 sorted - 0=no
                                     0 |             // 4-5 reserved
                                     paletteSize);   // 6-8 size of color table
-            
+
             } //else
 
         } //write_image_desc
